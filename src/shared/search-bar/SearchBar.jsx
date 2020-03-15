@@ -18,7 +18,7 @@ export default class SearchBar extends React.Component {
      * @param {*} term to be searched
      */
     onInputChange(term) {
-        this.setState({term});
+        this.setState({ term });
         this.props.onSearch(term);
     }
 

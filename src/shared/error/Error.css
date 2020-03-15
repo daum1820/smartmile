@@ -1,9 +1,17 @@
-.loading {
+.error {
     position: absolute;
     width: 100vw;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    color: red;
+    display: flex;
+    flex-direction: column;
     z-index: 100;
+}
+
+.error .error-label {
+    margin: 2rem;
+    font-size: 18px;
 }

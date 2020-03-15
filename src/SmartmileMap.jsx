@@ -2,6 +2,7 @@ import React from 'react';
 import { GoogleMap, LoadScript } from '@react-google-maps/api'
 import { debounce, isEmpty, isNil } from 'lodash';
 
+import Error from './shared/error/Error';
 import LoadingBar from './shared/loading-bar/LoadingBar';
 import SearchBar from './shared/search-bar/SearchBar';
 import { MapProvider } from './shared/provider/MapProvider';
@@ -20,14 +21,18 @@ export default class SmartmileMap extends React.Component {
     }
 
     state = {
+        error: false,
         locations: [],
         map: undefined,
         search: undefined,
     };
 
     async componentDidMount() {
+
         // fetch all locations and update component state
-        const locations = await locationAPI.getAll();
+        const locations = await locationAPI.getAll().catch(() => {
+            this.setState({ error: true })
+        });
         this.setState({ locations });
 
         if (!isEmpty(locations) && !isNil(this.state.map)) {
@@ -59,10 +64,14 @@ export default class SmartmileMap extends React.Component {
      *  if no search term is provided, return all locations from component's state.
      */
     onFilter = (search, locations) => {
+        // return empty if there is no locations
+        if (isEmpty(locations)) {
+            return [];
+        }
         // return all locations if there is no terms to search
-        if (isEmpty(this.state.search)) {
+        if (isEmpty(search)) {
             return locations;
-        }   
+        }
 
         // filter location by Location's name or address
         return locations.filter(l =>  {
@@ -88,24 +97,29 @@ export default class SmartmileMap extends React.Component {
     }
 
     render() {
-        let loadingBarHTML = null;
-        let loadingClassName = 'smartmile-map-container';
+        let { locations, error } = this.state;
+        let containerHTML = null;
+        let containerClassName = 'smartmile-map-container';
 
-        // shows loading if locations are not available
-        if (isEmpty(this.state.locations)) {
-            loadingClassName = `${loadingClassName} loading`;
-            loadingBarHTML= (<LoadingBar />);
+        if (error) {
+            // return if something wrong happened.
+            containerHTML = (<Error />);
+            containerClassName = `${containerClassName} opacity`;
+        } else if (isEmpty(locations)) {
+            // shows loading if locations are not available
+            containerClassName = `${containerClassName} opacity`;
+            containerHTML= (<LoadingBar />);
         }
 
         // Debounce to prevent the search to be triggered for every single changes on `SearchBar`
         const searchDebounce = debounce(term => this.onSearch(term), 500);
         return (
             <div>
-                { loadingBarHTML }
+                { containerHTML }
                 <LoadScript
                     googleMapsApiKey={`${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`}>
                     <GoogleMap
-                        mapContainerClassName={loadingClassName}
+                        mapContainerClassName={containerClassName}
                         zoom={this.props.zoom}
                         center={this.props.center}
                         onLoad={map => this.onLoad(map)}>
