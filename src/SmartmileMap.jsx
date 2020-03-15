@@ -1,8 +1,9 @@
 import React from 'react';
 import { GoogleMap, LoadScript } from '@react-google-maps/api'
-import { isEmpty, isNil } from 'lodash';
+import { debounce, isEmpty, isNil } from 'lodash';
 
 import LoadingBar from './shared/loading-bar/LoadingBar';
+import SearchBar from './shared/search-bar/SearchBar';
 import LocationMarker from './location/LocationMarker';
 import locationAPI from './location/location.api';
 
@@ -19,7 +20,8 @@ export default class SmartmileMap extends React.Component {
 
     state = {
         locations: [],
-        map: undefined
+        map: undefined,
+        search: undefined,
     };
 
     async componentDidMount() {
@@ -45,13 +47,38 @@ export default class SmartmileMap extends React.Component {
      */
     onLoad = (map) => this.setState({ map });
 
+        /**
+     *  set search term on component state after the `SearchBar` was used.
+     */
+    onSearch = (search) => this.setState({ search });
+
+    /**
+     *  filter the locations based on their address and name.
+     *  return all locations where desired term was found.
+     *  if no search term is provided, return all locations from component's state.
+     */
+    onFilter = (search, locations) => {
+        // return all locations if there is no terms to search
+        if (isEmpty(this.state.search)) {
+            return locations;
+        }   
+
+        // filter location by Location's name or address
+        return locations.filter(l =>  {
+            return  l.name.toLowerCase().includes(search.toLowerCase()) ||
+            l.address.street.toLowerCase().includes(search.toLowerCase()) ||
+            l.address.cityAndPostcode.toLowerCase().includes(search.toLowerCase()) ||
+            l.address.country.toLowerCase().includes(search.toLowerCase()) 
+        })
+    }
+
     /**
      * Render all children component's as `LocationMarker`
      */
     renderLocationMarkers() {
-        let { locations } = this.state;
+        let { locations, search } = this.state;
              
-        return locations.map(location => (
+        return this.onFilter(search, locations).map(location => (
             <LocationMarker
                 key={location.id}
                 location={location}
@@ -69,6 +96,8 @@ export default class SmartmileMap extends React.Component {
             loadingBarHTML= (<LoadingBar />);
         }
 
+        // Debounce to prevent the search to be triggered for every single changes on `SearchBar`
+        const searchDebounce = debounce(term => this.onSearch(term), 500);
         return (
             <div>
                 { loadingBarHTML }
@@ -79,6 +108,7 @@ export default class SmartmileMap extends React.Component {
                         zoom={this.props.zoom}
                         center={this.props.center}
                         onLoad={map => this.onLoad(map)}>
+                            <SearchBar onSearch={searchDebounce} />
                             {this.renderLocationMarkers()}                      
                     </GoogleMap>
                 </LoadScript>
