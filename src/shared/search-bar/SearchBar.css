@@ -21,7 +21,7 @@
 }
 .search-bar-container .icon {
     position: relative;
-    right: 40px;
+    right: 30px;
     top: 0px;
     color: #c0c0c0;
 }
@@ -29,5 +29,5 @@
     cursor: pointer;
 }
 .search-bar-container .icon.button:hover {
-    color: rgba(#cc0000, 0.5);
+    color: rgba(204, 0, 0, 0.7);
 }
