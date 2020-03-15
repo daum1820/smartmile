@@ -4,6 +4,7 @@ import { debounce, isEmpty, isNil } from 'lodash';
 
 import LoadingBar from './shared/loading-bar/LoadingBar';
 import SearchBar from './shared/search-bar/SearchBar';
+import { MapProvider } from './shared/provider/MapProvider';
 import LocationMarker from './location/LocationMarker';
 import locationAPI from './location/location.api';
 
@@ -109,7 +110,9 @@ export default class SmartmileMap extends React.Component {
                         center={this.props.center}
                         onLoad={map => this.onLoad(map)}>
                             <SearchBar onSearch={searchDebounce} />
-                            {this.renderLocationMarkers()}                      
+                            <MapProvider>
+                                {this.renderLocationMarkers()}
+                            </MapProvider>                   
                     </GoogleMap>
                 </LoadScript>
             </div>

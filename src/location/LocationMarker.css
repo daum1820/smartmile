@@ -1,0 +1,23 @@
+.info-window-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-window-container .title {
+    text-align: center;
+}
+
+.info-window-container .container {
+    margin: 0.25rem 0.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.info-window-container .container:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+}
+.info-window-container div {
+    flex-grow: 2;
+    margin: 0.25rem 0.8rem;
+}
