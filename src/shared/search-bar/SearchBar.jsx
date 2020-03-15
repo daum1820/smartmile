@@ -28,10 +28,10 @@ export default class SearchBar extends React.Component {
      */
     renderIcon() {
         if (isEmpty(this.state.term) ){
-            return (<FontAwesomeIcon  className="icon" icon={faSearch} size="lg"/>);
+            return (<FontAwesomeIcon  className="icon" icon={faSearch} />);
         } else {
             return (
-                <FontAwesomeIcon className="icon button" icon={faTimesCircle} size="lg" onClick={() => this.onInputChange('')}/>
+                <FontAwesomeIcon className="icon button" icon={faTimesCircle} onClick={() => this.onInputChange('')}/>
             )
         }
     }
